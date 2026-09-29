@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,14 @@ if (!API_KEY) {
     console.error('GEMINI_API_KEY is missing in .env file');
     process.exit(1);
 }
+
+const summarizeLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    message: { error: 'Too many requests. Please try again later.' },
+});
+
+app.use('/summarize', summarizeLimiter);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
