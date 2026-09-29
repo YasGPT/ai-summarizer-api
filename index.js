@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+const MAX_LENGTH = 5000;
 const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL =
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
@@ -14,11 +15,19 @@ if (!API_KEY) {
     process.exit(1);
 }
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
 app.post('/summarize', async (req, res) => {
     const { text } = req.body;
 
     if (!text || typeof text !== 'string' || !text.trim()) {
         return res.status(400).json({ error: 'Please send some text to summarize.' });
+    }
+
+    if (text.length > MAX_LENGTH) {
+        return res.status(400).json({ error: 'Text must be under 5000 characters.' });
     }
 
     try {
