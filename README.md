@@ -1,6 +1,24 @@
 # AI Summarizer API
 
-A lightweight REST API built with Express and Google Gemini that generates concise summaries from input text.
+A lightweight REST API built with Express and Google Gemini that generates concise summaries from input text. This is a learning project exploring API design, input validation, and deployment.
+
+## Live Demo
+
+The API is deployed on Render:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| [`/health`](https://ai-summarizer-api-jmmb.onrender.com/health) | GET | Server status check |
+| `/summarize` | POST | Generate a summary from input text |
+
+> **Note:** The free Render instance spins down after periods of inactivity. The first request after a cold start may take **20–30 seconds** to respond. Subsequent requests are fast.
+
+## Features
+
+- **Input validation** — rejects empty or missing `text` fields with clear error messages
+- **Rate limiting** — 10 requests per 15-minute window on `/summarize`
+- **Environment-based secret management** — API keys loaded from `.env`, never committed
+- **Health check endpoint** — `GET /health` for uptime monitoring
 
 ## Getting Started
 
@@ -36,9 +54,19 @@ The server will start on `http://localhost:3000`.
 }
 ```
 
-### PowerShell Example
+### curl
+```bash
+curl -X POST https://ai-summarizer-api-jmmb.onrender.com/summarize \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Node.js is a JavaScript runtime built on the V8 engine. It lets developers run JavaScript on the server. It is widely used to build APIs and real-time apps."}'
+```
+
+### PowerShell
 ```powershell
-Invoke-RestMethod -Method Post -Uri http://localhost:3000/summarize -ContentType "application/json" -Body '{"text":"Node.js is a JavaScript runtime built on the V8 engine. It lets developers run JavaScript on the server. It is widely used to build APIs and real-time apps."}'
+Invoke-RestMethod -Method Post `
+  -Uri https://ai-summarizer-api-jmmb.onrender.com/summarize `
+  -ContentType "application/json" `
+  -Body '{"text":"Node.js is a JavaScript runtime built on the V8 engine. It lets developers run JavaScript on the server. It is widely used to build APIs and real-time apps."}'
 ```
 
 ### Response
