@@ -12,6 +12,12 @@ const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL =
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent';
 
+const SUMMARY_INSTRUCTIONS = {
+    short: 'Summarize the following text in 1 sentence',
+    medium: 'Summarize the following text in 2-3 sentences',
+    long: 'Summarize the following text in a detailed paragraph',
+};
+
 if (!API_KEY) {
     console.error('GEMINI_API_KEY is missing in .env file');
     process.exit(1);
@@ -30,7 +36,7 @@ app.get('/health', (req, res) => {
 });
 
 app.post('/summarize', async (req, res) => {
-    const { text } = req.body;
+    const { text, length = 'medium' } = req.body;
 
     if (!text || typeof text !== 'string' || !text.trim()) {
         return res.status(400).json({ error: 'Please send some text to summarize.' });
@@ -38,6 +44,10 @@ app.post('/summarize', async (req, res) => {
 
     if (text.length > MAX_LENGTH) {
         return res.status(400).json({ error: 'Text must be under 5000 characters.' });
+    }
+
+    if (!SUMMARY_INSTRUCTIONS[length]) {
+        return res.status(400).json({ error: 'length must be short, medium, or long.' });
     }
 
     try {
@@ -49,7 +59,7 @@ app.post('/summarize', async (req, res) => {
             },
             body: JSON.stringify({
                 contents: [
-                    { parts: [{ text: `Summarize the following text in 2-3 sentences:\n\n${text}` }] },
+                    { parts: [{ text: `${SUMMARY_INSTRUCTIONS[length]}:\n\n${text}` }] },
                 ],
             }),
         });
